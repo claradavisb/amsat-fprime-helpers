@@ -1,0 +1,20 @@
+FROM debian:bullseye
+RUN apt-get update && apt-get install -y \
+    cmake ninja-build build-essential python3 python3-pip python3-venv git \
+    curl xz-utils && rm -rf /var/lib/apt/lists/*
+
+# Download ARM toolchain to /opt/toolchains
+RUN mkdir -p /opt/toolchains && \
+    curl -Ls https://developer.arm.com/-/media/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz \
+    | tar -JC /opt/toolchains --strip-components=1 -x
+
+ENV ARM_TOOLS_PATH=/opt/toolchains
+
+COPY lib/fprime/requirements.txt /tmp/fprime-requirements.txt
+RUN python3 -m venv /opt/fprime-venv && \
+    . /opt/fprime-venv/bin/activate && \
+    pip install fprime-tools fprime-gds && \
+    pip install -r /tmp/fprime-requirements.txt
+
+WORKDIR /build
+CMD ["tail", "-f", "/dev/null"]
