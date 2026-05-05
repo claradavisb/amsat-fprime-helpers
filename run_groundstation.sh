@@ -31,6 +31,4 @@ docker run --rm -it \
   --privileged \
   -e DISPLAY="$DISPLAY" \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v /run/user/0/pulse:/run/user/0/pulse \
-  -e PULSE_SERVER=unix:/run/user/0/pulse/native \
   fprime-groundstation

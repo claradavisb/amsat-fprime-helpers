@@ -14,6 +14,8 @@ GDS_DICT="/opt/fprime-amsat-reference/build-artifacts/arm-hf-linux/CDHDeployment
 VENV=". /opt/fprime-venv/bin/activate"
 
 # Set up PulseAudio null sink
+pulseaudio --start
+sleep 1
 ./setup_pulseaudio.sh
 
 tmux new-session -d -s $SESSION -x 220 -y 50
