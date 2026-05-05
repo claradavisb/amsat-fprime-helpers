@@ -1,0 +1,33 @@
+#!/bin/bash
+# Starts all ground station components in a tmux session with labelled panes.
+# Layout:
+#   +-------------------------+-------------------------+
+#   | [direwolf]              | [hackrf / new_aprs.py]  |
+#   +-------------------------+-------------------------+
+#   | [fprime-gds]            | [shell]                 |
+#   +-------------------------+-------------------------+
+
+set -e
+
+SESSION="groundstation"
+GDS_DICT="/opt/fprime-amsat-reference/build-artifacts/arm-hf-linux/CDHDeployment"
+VENV=". /opt/fprime-venv/bin/activate"
+
+tmux new-session -d -s $SESSION -x 220 -y 50
+
+# Pane 0 (top-left): PulseAudio setup then Direwolf
+tmux send-keys -t $SESSION:0 './setup_pulseaudio.sh && direwolf -c direwolf-tx.conf' Enter
+
+# Pane 1 (top-right): GNU Radio + HackRF
+tmux split-window -h -t $SESSION:0
+tmux send-keys -t $SESSION:0.1 'python3 new_aprs.py' Enter
+
+# Pane 2 (bottom-left): fprime-gds
+tmux split-window -v -t $SESSION:0.0
+tmux send-keys -t $SESSION:0.2 \
+  "$VENV && fprime-gds --communication-selection ip --ip-address 127.0.0.1 --ip-port 8001 --ip-client --framing-selection ax25-kiss -d $GDS_DICT -n" Enter
+
+# Pane 3 (bottom-right): spare shell
+tmux split-window -v -t $SESSION:0.1
+
+tmux attach-session -t $SESSION

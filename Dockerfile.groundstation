@@ -1,0 +1,50 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    gnuradio \
+    gr-osmosdr \
+    hackrf \
+    libhackrf-dev \
+    direwolf \
+    libasound2-dev \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-pyqt5 \
+    python3-packaging \
+    pulseaudio-utils \
+    alsa-utils \
+    cmake \
+    ninja-build \
+    build-essential \
+    git \
+    curl \
+    xz-utils \
+    tmux \
+    && rm -rf /var/lib/apt/lists/*
+
+# ARM cross-compilation
+RUN mkdir -p /opt/toolchains && \
+    curl -Ls https://developer.arm.com/-/media/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz \
+    | tar -JC /opt/toolchains --strip-components=1 -x
+
+ENV ARM_TOOLS_PATH=/opt/toolchains
+
+RUN git clone https://github.com/claradavisb/amsat-fprime-helpers /opt/amsat-fprime-helpers && \
+    git clone --recurse-submodules https://github.com/claradavisb/fprime-amsat-reference /opt/fprime-amsat-reference
+
+RUN python3 -m venv /opt/fprime-venv && \
+    . /opt/fprime-venv/bin/activate && \
+    pip install fprime-tools fprime-gds && \
+    pip install -r /opt/fprime-amsat-reference/lib/fprime/requirements.txt && \
+    pip install -e /opt/fprime-amsat-reference/GDS
+
+RUN . /opt/fprime-venv/bin/activate && \
+    cd /opt/fprime-amsat-reference && \
+    fprime-util generate arm-hf-linux && \
+    fprime-util build arm-hf-linux
+
+WORKDIR /opt/amsat-fprime-helpers/helpers
+CMD ["/opt/amsat-fprime-helpers/helpers/start_groundstation.sh"]
