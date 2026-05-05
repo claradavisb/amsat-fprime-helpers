@@ -13,10 +13,13 @@ SESSION="groundstation"
 GDS_DICT="/opt/fprime-amsat-reference/build-artifacts/arm-hf-linux/CDHDeployment"
 VENV=". /opt/fprime-venv/bin/activate"
 
+# Set up PulseAudio null sink
+./setup_pulseaudio.sh
+
 tmux new-session -d -s $SESSION -x 220 -y 50
 
-# Pane 0 (top-left): PulseAudio setup then Direwolf
-tmux send-keys -t $SESSION:0 './setup_pulseaudio.sh && direwolf -c direwolf-tx.conf' Enter
+# Pane 0 (top-left): Direwolf
+tmux send-keys -t $SESSION:0 'direwolf -c direwolf-tx.conf' Enter
 
 # Pane 1 (top-right): GNU Radio + HackRF
 tmux split-window -h -t $SESSION:0

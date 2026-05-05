@@ -33,7 +33,8 @@ RUN mkdir -p /opt/toolchains && \
 ENV ARM_TOOLS_PATH=/opt/toolchains
 
 RUN git clone https://github.com/claradavisb/amsat-fprime-helpers /opt/amsat-fprime-helpers && \
-    git clone --recurse-submodules https://github.com/claradavisb/fprime-amsat-reference /opt/fprime-amsat-reference
+    git clone --recurse-submodules https://github.com/claradavisb/fprime-amsat-reference /opt/fprime-amsat-reference && \
+    chmod +x /opt/amsat-fprime-helpers/helpers/*.sh
 
 RUN python3 -m venv /opt/fprime-venv && \
     . /opt/fprime-venv/bin/activate && \
