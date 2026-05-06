@@ -29,6 +29,7 @@ echo ""
 
 docker run --rm -it \
   --privileged \
+  -p 5000:5000 \
   -e DISPLAY="$DISPLAY" \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   fprime-groundstation

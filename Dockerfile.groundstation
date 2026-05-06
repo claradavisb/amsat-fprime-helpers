@@ -33,6 +33,12 @@ RUN mkdir -p /opt/toolchains && \
 
 ENV ARM_TOOLS_PATH=/opt/toolchains
 
+# GNU Radio needs this to use POSIX shared memory instead of CreateFileMapping,
+# which is unavailable inside Docker/WSL2
+RUN mkdir -p /root/.gnuradio/prefs && \
+    echo "vmcircbuf_default_factory=gr::vmcircbuf_sysv_shm_factory" \
+    > /root/.gnuradio/prefs/vmcircbuf_default_factory
+
 RUN git clone https://github.com/claradavisb/amsat-fprime-helpers /opt/amsat-fprime-helpers && \
     git clone --recurse-submodules https://github.com/claradavisb/fprime-amsat-reference /opt/fprime-amsat-reference && \
     chmod +x /opt/amsat-fprime-helpers/helpers/*.sh
