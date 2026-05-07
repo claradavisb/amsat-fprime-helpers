@@ -7,32 +7,36 @@
 #   | [fprime-gds]            | [shell]                 |
 #   +-------------------------+-------------------------+
 
-set -e
-
 SESSION="groundstation"
 GDS_DICT="/opt/fprime-amsat-reference/build-artifacts/arm-hf-linux/CDHDeployment"
 VENV=". /opt/fprime-venv/bin/activate"
 
 # Set up PulseAudio null sink
-pulseaudio --start
+pulseaudio --start --system || pulseaudio -D --system || true
 sleep 1
 ./setup_pulseaudio.sh
 
 tmux new-session -d -s $SESSION -x 220 -y 50
+tmux set -g mouse on
+sleep 1
 
-# Pane 0: Direwolf
-tmux send-keys -t $SESSION:0 'direwolf -c direwolf-tx.conf' Enter
+# Pane 0 (top left): Direwolf
+PANE0=$SESSION:0.0
+tmux send-keys -t $PANE0 'direwolf -c direwolf-tx.conf' Enter
 
-# Pane 1: GNU Radio + HackRF
-tmux split-window -h -t $SESSION:0
-tmux send-keys -t $SESSION:0.1 'python3 new_aprs.py' Enter
+# Pane 1 (top right): GNU Radio + HackRF
+PANE1=$(tmux split-window -h -t $PANE0 -P -F "#{pane_id}")
+sleep 0.5
+tmux send-keys -t $PANE1 'python3 new_aprs.py' Enter
 
-# Pane 2: fprime-gds
-tmux split-window -v -t $SESSION:0.0
-tmux send-keys -t $SESSION:0.2 \
+# Pane 2 (bottom left): fprime-gds
+PANE2=$(tmux split-window -v -t $PANE0 -P -F "#{pane_id}")
+sleep 0.5
+tmux send-keys -t $PANE2 \
   "$VENV && fprime-gds --communication-selection ip --ip-address 127.0.0.1 --ip-port 8001 --ip-client --framing-selection ax25-kiss -d $GDS_DICT --gui-addr 0.0.0.0 -n" Enter
 
-# Pane 3: spare shell
-tmux split-window -v -t $SESSION:0.1
+# Pane 3 (bottom right): spare shell
+tmux split-window -v -t $PANE1
+sleep 0.5
 
 tmux attach-session -t $SESSION

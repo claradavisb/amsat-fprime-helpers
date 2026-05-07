@@ -10,7 +10,7 @@
 
 set -e
 
-docker build -f Dockerfile.groundstation -t fprime-groundstation .
+docker build --no-cache -f Dockerfile.groundstation -t fprime-groundstation .
 
 echo ""
 echo "Ground station container ready."
