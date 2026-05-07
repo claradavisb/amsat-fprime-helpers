@@ -13,7 +13,8 @@ VENV=". /opt/fprime-venv/bin/activate"
 
 # Set up PulseAudio null sink
 pulseaudio --start --system || pulseaudio -D --system || true
-sleep 1
+sleep 2
+export PULSE_SERVER=unix:/var/run/pulse/native
 ./setup_pulseaudio.sh
 
 tmux new-session -d -s $SESSION -x 220 -y 50
