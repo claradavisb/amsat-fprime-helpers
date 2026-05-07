@@ -14,11 +14,14 @@ VENV=". /opt/fprime-venv/bin/activate"
 # Set up PulseAudio null sink
 pulseaudio --start --system || pulseaudio -D --system || true
 sleep 2
+
+chmod 777 /var/run/pulse/native 2>/dev/null || true
 export PULSE_SERVER=unix:/var/run/pulse/native
 ./setup_pulseaudio.sh
 
 tmux new-session -d -s $SESSION -x 220 -y 50
 tmux set -g mouse on
+tmux setenv -g PULSE_SERVER "unix:/var/run/pulse/native"
 sleep 1
 
 # Pane 0 (top left): Direwolf
