@@ -94,7 +94,7 @@ class new_aprs(gr.top_block, Qt.QWidget):
         self.osmosdr_sink_0.set_sample_rate(samp_rate)
         self.osmosdr_sink_0.set_center_freq(435000000, 0)
         self.osmosdr_sink_0.set_freq_corr(0, 0)
-        self.osmosdr_sink_0.set_gain(0, 0)
+        self.osmosdr_sink_0.set_gain(14, 0)
         self.osmosdr_sink_0.set_if_gain(20, 0)
         self.osmosdr_sink_0.set_bb_gain(7, 0)
         self.osmosdr_sink_0.set_antenna('', 0)
