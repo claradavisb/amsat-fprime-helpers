@@ -39,9 +39,7 @@ RUN mkdir -p /root/.gnuradio/prefs && \
     echo "vmcircbuf_default_factory=gr::vmcircbuf_sysv_shm_factory" \
     > /root/.gnuradio/prefs/vmcircbuf_default_factory
 
-RUN git clone https://github.com/claradavisb/amsat-fprime-helpers /opt/amsat-fprime-helpers && \
-    git clone --recurse-submodules https://github.com/claradavisb/fprime-amsat-reference /opt/fprime-amsat-reference && \
-    chmod +x /opt/amsat-fprime-helpers/helpers/*.sh
+RUN git clone --recurse-submodules https://github.com/claradavisb/fprime-amsat-reference /opt/fprime-amsat-reference
 
 RUN python3 -m venv /opt/fprime-venv && \
     . /opt/fprime-venv/bin/activate && \
@@ -53,6 +51,9 @@ RUN . /opt/fprime-venv/bin/activate && \
     cd /opt/fprime-amsat-reference && \
     fprime-util generate arm-hf-linux && \
     fprime-util build arm-hf-linux
+
+RUN git clone https://github.com/claradavisb/amsat-fprime-helpers /opt/amsat-fprime-helpers && \
+    chmod +x /opt/amsat-fprime-helpers/helpers/*.sh
 
 WORKDIR /opt/amsat-fprime-helpers/helpers
 CMD ["/opt/amsat-fprime-helpers/helpers/start_groundstation.sh"]

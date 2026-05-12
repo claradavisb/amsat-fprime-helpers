@@ -10,26 +10,9 @@
 
 set -e
 
-docker build --no-cache -f Dockerfile.groundstation -t fprime-groundstation .
-
-echo ""
-echo "Ground station container ready."
-echo "Inside the container (working dir is /opt/amsat-fprime-helpers/helpers):"
-echo "  ./setup_pulseaudio.sh"
-echo "  direwolf -c direwolf-tx.conf"
-echo "  python3 new_aprs.py"
-echo "  . /opt/fprime-venv/bin/activate && fprime-gds --communication-selection ip \\"
-echo "      --ip-address 127.0.0.1 --ip-port 8001 --ip-client \\"
-echo "      --framing-selection ax25-kiss \\"
-echo "      -d /opt/fprime-amsat-reference/build-artifacts/arm-hf-linux/CDHDeployment -n"
-echo ""
-echo "The built ARM binary is at:"
-echo "  /opt/fprime-amsat-reference/build-artifacts/arm-hf-linux/CDHDeployment/bin/CDHDeployment"
-echo ""
+docker build -f Dockerfile.groundstation -t fprime-groundstation .
 
 docker run --rm -it \
   --privileged \
   -p 5000:5000 \
-  -e DISPLAY="$DISPLAY" \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \
   fprime-groundstation
