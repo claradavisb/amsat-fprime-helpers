@@ -1,0 +1,8 @@
+services:
+  groundstation:
+    image: claradavis/cubesatsim-fprime-gds:latest
+    privileged: true
+    ports:
+      - "5000:5000"
+    stdin_open: true
+    tty: true

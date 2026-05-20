@@ -24,6 +24,7 @@ autospawn = no
 enable-shm = false
 EOF
 
+mkdir -p /var/run/pulse
 pulseaudio -D --system || true
 sleep 2
 ./setup_pulseaudio.sh
@@ -53,4 +54,6 @@ tmux send-keys -t $PANE2 \
 tmux split-window -v -t $PANE1
 sleep 0.5
 
-tmux attach-session -t $SESSION
+# Attach if running in a terminal; otherwise keep the container alive so the
+# GDS web interface remains reachable from Docker Desktop / docker run -d.
+tmux attach-session -t $SESSION 2>/dev/null || tail -f /dev/null
