@@ -25,7 +25,6 @@ RUN apt-get update && apt-get install -y \
     curl \
     xz-utils \
     tmux \
-    nano \
     && rm -rf /var/lib/apt/lists/*
 
 # ARM cross-compilation
@@ -42,7 +41,7 @@ RUN mkdir -p /root/.gnuradio/prefs && \
     > /root/.gnuradio/prefs/vmcircbuf_default_factory
 
 ARG CACHEBUST=1
-RUN git clone --recurse-submodules --depth 1 https://github.com/claradavisb/fprime-amsat-reference /opt/fprime-amsat-reference
+RUN git clone --recurse-submodules --depth 1 -b main https://github.com/claradavisb/fprime-amsat-reference /opt/fprime-amsat-reference
 
 RUN python3 -m venv /opt/fprime-venv && \
     . /opt/fprime-venv/bin/activate && \
@@ -55,8 +54,9 @@ RUN . /opt/fprime-venv/bin/activate && \
     fprime-util generate arm-hf-linux && \
     fprime-util build arm-hf-linux
 
-RUN git clone https://github.com/claradavisb/amsat-fprime-helpers /opt/amsat-fprime-helpers && \
-    chmod +x /opt/amsat-fprime-helpers/helpers/*.sh
+# Copy local helpers last so script changes don't invalidate the build cache
+COPY helpers/ /opt/amsat-fprime-helpers/helpers/
+RUN chmod +x /opt/amsat-fprime-helpers/helpers/*.sh
 
 WORKDIR /opt/amsat-fprime-helpers/helpers
 CMD ["/opt/amsat-fprime-helpers/helpers/start_groundstation.sh"]
