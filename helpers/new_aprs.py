@@ -88,15 +88,15 @@ class new_aprs(gr.top_block, Qt.QWidget):
                 taps=[],
                 fractional_bw=0)
         self.osmosdr_sink_0 = osmosdr.sink(
-            args="numchan=" + str(1) + " " + ""
+            args="numchan=1 hackrf=0"
         )
         self.osmosdr_sink_0.set_time_unknown_pps(osmosdr.time_spec_t())
         self.osmosdr_sink_0.set_sample_rate(samp_rate)
         self.osmosdr_sink_0.set_center_freq(435000000, 0)
         self.osmosdr_sink_0.set_freq_corr(0, 0)
         self.osmosdr_sink_0.set_gain(14, 0)
-        self.osmosdr_sink_0.set_if_gain(20, 0)
-        self.osmosdr_sink_0.set_bb_gain(7, 0)
+        self.osmosdr_sink_0.set_if_gain(10, 0)
+        self.osmosdr_sink_0.set_bb_gain(0, 0)
         self.osmosdr_sink_0.set_antenna('', 0)
         self.osmosdr_sink_0.set_bandwidth(0, 0)
         self.audio_source_0 = audio.source(48000, "pulse", True)

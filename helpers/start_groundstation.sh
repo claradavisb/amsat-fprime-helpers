@@ -2,10 +2,13 @@
 # Starts all ground station components in a tmux session with labelled panes.
 # Layout:
 #   +-------------------------+-------------------------+
-#   | [direwolf]              | [hackrf / new_aprs.py]  |
+#   | [direwolf tx+rx]        | [hackrf TX / new_aprs]  |
 #   +-------------------------+-------------------------+
-#   | [fprime-gds]            | [shell]                 |
+#   | [fprime-gds]            | [rtlsdr RX / rx_aprs]   |
 #   +-------------------------+-------------------------+
+#
+# HackRF (new_aprs.py) handles uplink TX on 435 MHz.
+# RTL-SDR (rx_aprs.py) handles downlink RX on 434.9 MHz simultaneously.
 
 SESSION="groundstation"
 GDS_DICT="/opt/fprime-amsat-reference/build-artifacts/arm-hf-linux/CDHDeployment"
@@ -39,7 +42,7 @@ sleep 1
 PANE0=$SESSION:0.0
 tmux send-keys -t $PANE0 'direwolf -c direwolf-tx.conf' Enter
 
-# Pane 1 (top right): GNU Radio + HackRF
+# Pane 1 (top right): HackRF TX uplink
 PANE1=$(tmux split-window -h -t $PANE0 -P -F "#{pane_id}")
 sleep 0.5
 tmux send-keys -t $PANE1 'python3 new_aprs.py' Enter
@@ -50,9 +53,10 @@ sleep 0.5
 tmux send-keys -t $PANE2 \
   "$VENV && fprime-gds --communication-selection ip --ip-address 127.0.0.1 --ip-port 8001 --ip-client --framing-selection ax25-kiss -d $GDS_DICT --gui-addr 0.0.0.0 -n" Enter
 
-# Pane 3 (bottom right): spare shell
-tmux split-window -v -t $PANE1
+# Pane 3 (bottom right): RTL-SDR RX downlink
+PANE3=$(tmux split-window -v -t $PANE1 -P -F "#{pane_id}")
 sleep 0.5
+tmux send-keys -t $PANE3 'python3 rx_aprs.py' Enter
 
 # Attach if running in a terminal; otherwise keep the container alive so the
 # GDS web interface remains reachable from Docker Desktop / docker run -d.
