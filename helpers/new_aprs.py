@@ -95,11 +95,12 @@ class new_aprs(gr.top_block, Qt.QWidget):
         self.osmosdr_sink_0.set_center_freq(435000000, 0)
         self.osmosdr_sink_0.set_freq_corr(0, 0)
         self.osmosdr_sink_0.set_gain(14, 0)
-        self.osmosdr_sink_0.set_if_gain(10, 0)
+        self.osmosdr_sink_0.set_if_gain(47, 0)
         self.osmosdr_sink_0.set_bb_gain(0, 0)
         self.osmosdr_sink_0.set_antenna('', 0)
         self.osmosdr_sink_0.set_bandwidth(0, 0)
         self.audio_source_0 = audio.source(48000, "pulse", True)
+        self.blocks_multiply_const_0 = blocks.multiply_const_ff(0.25)
         self.analog_nbfm_tx_0 = analog.nbfm_tx(
         	audio_rate=48000,
         	quad_rate=48000,
@@ -113,7 +114,8 @@ class new_aprs(gr.top_block, Qt.QWidget):
         # Connections
         ##################################################
         self.connect((self.analog_nbfm_tx_0, 0), (self.rational_resampler_xxx_0, 0))
-        self.connect((self.audio_source_0, 0), (self.analog_nbfm_tx_0, 0))
+        self.connect((self.audio_source_0, 0), (self.blocks_multiply_const_0, 0))
+        self.connect((self.blocks_multiply_const_0, 0), (self.analog_nbfm_tx_0, 0))
         self.connect((self.rational_resampler_xxx_0, 0), (self.osmosdr_sink_0, 0))
 
 
