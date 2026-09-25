@@ -53,6 +53,21 @@ RUN . /opt/fprime-venv/bin/activate && \
     fprime-util generate arm-hf-linux && \
     fprime-util build arm-hf-linux
 
+# The RTL-SDR Blog V4 needs the vendor librtlsdr fork -- mainline can't lock
+# the R828D PLL (symptom: repeated "[R82XX] PLL not locked!"). Overwrite the
+# distro library in place rather than removing the package: apt-get remove
+# librtlsdr0 cascades into gr-osmosdr, which also provides osmosdr.sink for
+# the HackRF.
+RUN apt-get update && apt-get install -y libusb-1.0-0-dev && \
+    git clone --depth 1 https://github.com/rtlsdrblog/rtl-sdr-blog /tmp/rtl-sdr-blog && \
+    cmake -S /tmp/rtl-sdr-blog -B /tmp/rtl-sdr-blog/build \
+      -DINSTALL_UDEV_RULES=ON \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+      -DCMAKE_INSTALL_LIBDIR=lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH) && \
+    make -C /tmp/rtl-sdr-blog/build -j"$(nproc)" && \
+    make -C /tmp/rtl-sdr-blog/build install && ldconfig && \
+    rm -rf /tmp/rtl-sdr-blog /var/lib/apt/lists/*
+
 # Copy local helpers last so script changes don't invalidate the build cache
 COPY amsat-fprime-helpers/helpers/ /opt/amsat-fprime-helpers/helpers/
 RUN chmod +x /opt/amsat-fprime-helpers/helpers/*.sh

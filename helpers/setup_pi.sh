@@ -40,7 +40,7 @@ sudo systemctl enable direwolf-fprime.service
 # Direwolf config: receive-only on 435 MHz via USB sound card.
 # No PTT — downlink TX is handled by rpitx in F Prime RadioBridge.
 sudo tee /home/pi/direwolf-pi.conf > /dev/null << 'EOF'
-ADEVICE  plughw:1,0
+ADEVICE  plughw:CARD=Device,DEV=0
 ARATE    48000
 CHANNEL  0
 MYCALL   N0CALL-0
